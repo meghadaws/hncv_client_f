@@ -1,0 +1,193 @@
+<nb-card>
+  <nb-card-header status="success">
+    <div class="row">
+      <div class="col-xl-6 col-md-6 col-sm-6 col-6">
+      <label style="font-size: 140%;">Student Management</label>
+      </div>
+    </div>
+  </nb-card-header>
+  <nb-card-body>
+    <form [formGroup]="searchForm">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Name</label><br />
+            <input
+              nbInput
+              formControlName="nameCtrl"
+              [(ngModel)]="name"
+              placeholder="firstname"
+              [ngClass]="{
+                'form-control-danger':
+                  searchForm.controls.nameCtrl.invalid &&
+                  (searchForm.controls.nameCtrl.dirty ||
+                    searchForm.controls.nameCtrl.touched)
+              }"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Email ID</label><br />
+            <input
+              nbInput
+              formControlName="emailCtrl"
+              [(ngModel)]="email"
+              placeholder="email"
+              [ngClass]="{
+                'form-control-danger':
+                  searchForm.controls.emailCtrl.invalid &&
+                  (searchForm.controls.emailCtrl.dirty ||
+                    searchForm.controls.emailCtrl.touched)
+              }"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <mat-form-field>
+            <mat-select placeholder="select Year" [(value)]="selectedYear" name="selectedYear" id="yearCtrl" 
+            (selectionChange)="filterValue($event)">
+              <mat-option *ngFor="let year of years" [value]="year.value" (selected) = "selectedYear === year.value">
+                {{ year.viewValue }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3 g-3" >
+         
+          <label style="color: white;">Search Button</label>
+          <br/>
+          <button nbButton (click)="search()">Search</button>
+       
+          <button style="margin-left: 10px;" nbButton (click)="clear()">Clear</button>
+        </div>
+      </div>
+    </form>
+
+    <br />
+    <div class="row">
+      <div class="col-lg-6">
+        <mat-form-field class="example-full-width">
+          <input
+            matInput
+            type="text"
+            [value]="filterText"
+            [placeholder]="filterPlaceholder"
+            [formControl]="filterInput"
+          />
+          <button
+            mat-button
+            *ngIf="filterText"
+            matSuffix
+            mat-icon-button
+            aria-label="Clear"
+            (click)="filterText = ''"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+        <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
+      </div>
+      
+    </div>
+    <div class="wrapper">
+      <h5>
+        <b>Total student count: {{ studentLength?.totalLength }} </b>
+      </h5>
+      <br /><br />
+      <div class="table-responsive">
+        <table
+          class="table table-striped table-bordered"
+          style="border-color: #455f78"
+        >
+          <thead style="background-color: #455f78; color: white">
+            <tr>
+              <th>Sr. No.</th>
+              <th>Full Name</th>
+              <th>Email Address</th>
+              <th>Registered Date</th>
+              <th>Action</th>
+              <th>isVerify</th>
+              <th>isActive</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="
+                let student of studentdata
+                  | filter
+                    : {
+                        name: filterText,
+                        email: filterText,
+                        types: filterText,
+                        id: filterText,
+                        surname: filterText
+                      }
+                    : false
+                  | paginate
+                    : {
+                        itemsPerPage: 10,
+                        totalItems: studentLength?.totalLength,
+                        currentPage: p
+                      }
+              "
+            >
+              <td>{{ student?.id }}</td>
+              <td>{{ student?.name }}</td>
+              <td>{{ student?.email }}</td>
+              <td>{{ student?.registered_on }}</td>
+              <td
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  justify-content: space-around;
+                "
+              >
+                <i
+                  class="fa ion-person"
+                  status="info"
+                  nbPopover="View More"
+                  nbPopoverMode="hover"
+                  (click)="handleClick(student.id)"
+                ></i>
+              </td>
+              <!-- Toggle for isVerify -->
+              <td>
+                <p-inputSwitch
+                  *ngIf="
+                    student.otp_verify !== 0 &&
+                    student.email_verification_token !== 0
+                  "
+                  [(ngModel)]="student.otp_verify"
+                  [disabled]="student.otp_verify===1"
+                  (ngModelChange)="
+                    updateOtpVerify($event,student.otp, student.email, student.id)
+                  "
+                >
+                </p-inputSwitch>
+              </td>
+
+              <!-- Toggle for isActive -->
+              <td>
+                <p-inputSwitch
+                  [ngModel]="student.userStatus === 'active'"
+                  (onChange)="onChangeStatus($event.checked, student.id)"
+                >
+                </p-inputSwitch>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="studentLength?.totalLength == 0">
+        <span style="color: red; font-size: 18px">No Data Available</span>
+      </div>
+    </div>
+    <pagination-controls
+      (pageChange)="pageChanged($event)"
+    ></pagination-controls>
+  </nb-card-body>
+</nb-card>

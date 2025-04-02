@@ -1,0 +1,36 @@
+<div class="container">
+
+   <div class="row">
+    <!-- <div class="col-md-4">
+      <div class="box">
+        <h5 style="background-color: #33e9ff;">Total Application</h5>
+        <h6>{{countdata?.total}}</h6>
+      </div>
+    </div> -->
+
+    <div class="col-md-4">
+      <div class="box">
+        <h5 style="background-color: #3366FF;">Pending Application</h5>
+        <h6>{{countdata?.apply}}</h6>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="box">
+        <h5 style="background-color: #5DADE2;">Signed Application</h5>
+        <h6>{{countdata?.signed}}</h6>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="box" >
+        <h5 style="background-color: #73C6B6;">Sent Application</h5>
+        <h6>{{countdata?.done}}</h6>
+      </div>
+    </div>
+
+    </div>
+  
+  <div echarts [options]="options" class="echart" [merge]= "mergeOptions"></div>
+
+</div>
